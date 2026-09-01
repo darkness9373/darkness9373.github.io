@@ -18,6 +18,29 @@
                 "1.21.90",
                 "1.21.100"
             ]
+        },
+        "minecraft:entity": {
+            "$ref": "#/$defs/entity"
+        }
+    },
+    "required": [
+        "format_version",
+        "minecraft:entity"
+    ],
+    "$defs": {
+        "entity": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "$ref": "#/$defs/entity_description"
+                },
+                "component": {
+                    "type": "object"
+                }
+            },
+            "required": [
+                "description"
+            ]
         }
     }
 }
