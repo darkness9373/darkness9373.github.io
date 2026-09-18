@@ -94,7 +94,7 @@ input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#1
 <section class="card" id="editorCard">
 <h2 data-i18n="editor">Editor</h2>
 <label for="text" data-i18n="rankText">Rank text</label>
-<input id="text" type="text" value="CUSTOM" autocomplete="off" spellcheck="false">
+<input id="text" type="text" value="OWNER" autocomplete="off" spellcheck="false">
 <div id="err" class="err"></div>
 <div class="row">
 <div>
@@ -254,8 +254,8 @@ function selftest(){
   console.assert(Object.keys(glyphs).length===46,"glyph!=46");
   console.assert(glyphs["A"].length>0,"A kosong");
   const c=document.createElement("canvas");
-  const r=paint(c,"CUSTOM",hexRgb("#C60000"),hexRgb("#FFDDDD"));
-  console.assert(r.W===35&&r.H===10,"CUSTOM harus 35x10, dapat "+r.W+"x"+r.H);
+  const r=paint(c,"OWNER",hexRgb("#C60000"),hexRgb("#FFDDDD"));
+  console.assert(r.W===35&&r.H===10,"OWNER harus 35x10, dapat "+r.W+"x"+r.H);
   console.assert(JSON.stringify(r.top)===JSON.stringify([228,30,30]),"top salah: "+r.top);
   console.assert(JSON.stringify(r.bot)===JSON.stringify([168,0,0]),"bottom salah: "+r.bot);
   const x=c.getContext("2d").getImageData(0,0,35,10).data;
