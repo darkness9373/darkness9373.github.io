@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rank Tag Maker</title>
+<style>
+:root{--bg:#141724;--card:#212740;--line:#39415f;--txt:#eef1ff;--mut:#9aa3c0;--acc:#5cff8a;--acc2:#38bdf8}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;background:radial-gradient(900px 400px at 20% -5%,#2b3a6b 0%,transparent 60%),radial-gradient(700px 380px at 90% 0%,#4c2b6b 0%,transparent 55%),var(--bg);color:var(--txt);margin:0;padding:28px 18px 48px;height:100vh;overflow:hidden}
+.wrap{max-width:940px;margin:0 auto;height:calc(100vh - 76px);display:flex;flex-direction:column}
+.hero{flex:0 0 auto}
+.hero h1{margin:0;font-size:30px;letter-spacing:.5px}
+.hero h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{margin:6px 0 18px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;flex:1;min-height:0}
+.grid>*{min-width:0;min-height:0}
+@media(max-width:760px){.grid{grid-template-columns:1fr;overflow-y:auto}}
+@media(max-width:760px){body{height:auto;overflow:auto}.wrap{height:auto}}
+.card{background:linear-gradient(180deg,#262d4b,#1d2338);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 12px 32px rgba(0,0,0,.4);min-height:0}
+#editorCard{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
+#editorCard::-webkit-scrollbar{width:10px}
+#editorCard::-webkit-scrollbar-thumb{background:var(--line);border-radius:8px}
+#editorCard::-webkit-scrollbar-track{background:transparent}
+#previewCard{overflow:hidden;display:flex;flex-direction:column}
+.card h2{margin:0 0 6px;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut)}
+label{display:block;margin:12px 0 6px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
+input[type=text],select{width:100%;padding:10px 12px;font-size:16px;background:#141834;color:var(--txt);border:1px solid var(--line);border-radius:10px;outline:none;transition:border-color .15s,box-shadow .15s,transform .15s}
+input[type=text]:hover,select:hover{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(56,189,248,.16);transform:translateY(-1px)}
+input[type=text]:focus,select:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(92,255,138,.18);transform:translateY(-1px)}
+.colorline{display:flex;gap:8px}
+.colorline input[type=text]{flex:1;min-width:0}
+.alphaline{display:grid;gap:4px;margin-top:8px}
+.alphaline .arow{display:flex;align-items:center;gap:8px}
+.alphaline span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.alphaline output{font-size:12px;color:var(--mut);min-width:32px;text-align:right}
+input[type=range]{flex:1;min-width:0;accent-color:var(--acc);cursor:pointer;transition:transform .15s,filter .15s}
+input[type=range]:hover{transform:translateY(-1px);filter:brightness(1.15)}
+input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#141834;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.file-drop{display:flex;align-items:center;gap:10px;background:#141834;border:1px dashed var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;transition:border-color .15s,box-shadow .15s,transform .15s;overflow:hidden}
+.file-drop:hover{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(56,189,248,.16);transform:translateY(-1px)}
+.file-drop:active{transform:translateY(1px)}
+.file-drop input{display:none}
+.file-btn{flex:0 0 auto;font-size:13px;font-weight:800;color:#06130a;background:linear-gradient(180deg,#7dffab,#3ddc74);border-radius:8px;padding:8px 12px;box-shadow:0 3px 0 #1d7a3f;transition:filter .12s,transform .12s}
+.file-drop:hover .file-btn{filter:brightness(1.08);transform:translateY(-1px)}
+.file-meta{flex:1;min-width:0;font-size:12px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-meta b{display:block;font-size:12px;color:var(--txt);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.row>div{min-width:0}
+.row .full{grid-column:1/-1}
+@media(max-width:480px){.row{grid-template-columns:1fr}}
+#preview{image-rendering:pixelated;border-radius:4px;max-width:none;flex:0 0 auto}
+.stage{margin-top:10px;height:220px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:22px;border-radius:12px;border:1px solid var(--line);background:repeating-conic-gradient(#2c3352 0% 25%,#20263e 0% 50%) 0 0/18px 18px}
+.err{color:#ff8080;min-height:1.4em;margin-top:6px;overflow-wrap:anywhere}
+#info{display:block;margin:12px 0 0;color:#cfd6f2;font-size:13px;background:#141834;border:1px solid var(--line);border-radius:10px;padding:8px 12px;overflow-wrap:anywhere}
+.swatches{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.sw{width:28px;height:28px;border-radius:8px;border:1px solid rgba(255,255,255,.35);padding:0;cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35);transition:transform .08s}
+.sw:hover{transform:translateY(-2px) scale(1.06)}
+#dl{padding:12px 20px;font-size:16px;font-weight:800;cursor:pointer;margin-top:14px;color:#06130a;background:linear-gradient(180deg,#7dffab,#3ddc74);border:0;border-radius:12px;box-shadow:0 6px 0 #1d7a3f,0 12px 24px rgba(0,0,0,.4);transition:transform .12s,box-shadow .12s,filter .12s}
+#dl:hover{transform:translateY(-2px) scale(1.02);filter:brightness(1.08);box-shadow:0 8px 0 #1d7a3f,0 16px 28px rgba(0,0,0,.45)}
+#dl:active{transform:translateY(3px);box-shadow:0 2px 0 #1d7a3f}
+.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.hero>div:first-child{flex:1;min-width:0}
+.lang{display:flex;gap:6px;flex:0 0 auto}
+.lang button{background:#141834;color:var(--mut);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:700;cursor:pointer;margin:0;transition:border-color .15s,color .15s,transform .15s}
+.lang button:hover{color:var(--txt);border-color:var(--acc2);transform:translateY(-1px)}
+.lang button.on{color:#06130a;background:linear-gradient(180deg,#7dffab,#3ddc74);border-color:transparent}
+.dd{position:relative;width:100%}
+.dd-btn{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 12px;font-size:16px;background:#141834;color:var(--txt);border:1px solid var(--line);border-radius:10px;cursor:pointer;margin:0;transition:border-color .15s,box-shadow .15s,transform .15s}
+.dd-btn:hover{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(56,189,248,.16);transform:translateY(-1px)}
+.dd-btn.open{border-color:var(--acc);box-shadow:0 0 0 3px rgba(92,255,138,.18)}
+.dd-btn .arrow{display:inline-block;transition:transform .25s}
+.dd-btn.open .arrow{transform:rotate(180deg)}
+.dd-list{position:absolute;top:calc(100% + 6px);left:0;right:0;background:#1b2140;border:1px solid var(--line);border-radius:12px;padding:6px;z-index:60;box-shadow:0 16px 32px rgba(0,0,0,.5);opacity:0;transform:translateY(-10px) scale(.97);transform-origin:top center;pointer-events:none;transition:opacity .18s ease,transform .24s cubic-bezier(.2,.9,.3,1.25)}
+.dd.up .dd-list{top:auto;bottom:calc(100% + 6px);transform:translateY(10px) scale(.97);transform-origin:bottom center}
+.dd.open .dd-list{opacity:1;transform:none;pointer-events:auto}
+.dd-item{display:block;width:100%;text-align:left;background:transparent;border:0;color:var(--txt);padding:10px 12px;font-size:15px;border-radius:8px;cursor:pointer;margin:0;opacity:0;transform:translateY(-6px);transition:opacity .18s ease,transform .22s ease,background .12s}
+.dd.open .dd-item{opacity:1;transform:none}
+.dd-item:hover{background:rgba(56,189,248,.15)}
+.dd-item.sel{background:rgba(92,255,138,.15);font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header class="hero">
+<div>
+<h1>⛏️ Rank Tag <span>Maker</span></h1>
+<p data-i18n="sub">Pixel badge Minecraft-style — type text, pick colors, download server-ready 1x PNG.</p>
+</div>
+<div class="lang"><button type="button" id="langEn" class="on">EN</button><button type="button" id="langId">ID</button></div>
+</header>
+<div class="grid">
+<section class="card" id="editorCard">
+<h2 data-i18n="editor">Editor</h2>
+<label for="text" data-i18n="rankText">Rank text</label>
+<input id="text" type="text" value="OWNER" autocomplete="off" spellcheck="false">
+<div id="err" class="err"></div>
+<div class="row">
+<div>
+<label for="base" data-i18n="base">Base color</label>
+<div class="colorline"><input id="base" type="color" value="#c60000">
+<input id="baseHex" type="text" value="#C60000"></div>
+<div class="alphaline"><span data-i18n="bgAlpha">Background alpha</span><div class="arow"><input id="baseA" type="range" min="0" max="255" value="255"><output id="baseAVal">255</output></div></div>
+<div class="swatches" id="baseSw"></div>
+</div>
+<div>
+<label for="font" data-i18n="font">Font color</label>
+<div class="colorline"><input id="font" type="color" value="#ffdddd">
+<input id="fontHex" type="text" value="#FFDDDD"></div>
+<div class="alphaline"><span data-i18n="textAlpha">Text alpha</span><div class="arow"><input id="fontA" type="range" min="0" max="255" value="255"><output id="fontAVal">255</output></div></div>
+<div class="swatches" id="fontSw"></div>
+</div>
+<div class="full">
+<label for="olModeBtn" data-i18n="outline">Outline</label>
+<div class="dd" id="ddOl">
+<button type="button" class="dd-btn" id="olModeBtn"><span id="olModeLabel">Auto (follow base)</span><span class="arrow">▾</span></button>
+<div class="dd-list" id="olModeList">
+<button type="button" class="dd-item sel" data-val="auto" data-i18n="olAuto">Auto (follow base)</button>
+<button type="button" class="dd-item" data-val="none" data-i18n="olNone">None</button>
+<button type="button" class="dd-item" data-val="single" data-i18n="olSingle">Single color</button>
+<button type="button" class="dd-item" data-val="dual" data-i18n="olDual">Top + bottom colors</button>
+</div>
+</div>
+<div id="olSingleRow" class="colorline" style="margin-top:8px;display:none"><input id="ol1" type="color" value="#e33636"><input id="ol1Hex" type="text" value="#E33636"></div>
+<div id="olDualRow" style="display:none;margin-top:8px"><div class="colorline"><input id="olTop" type="color" value="#e33636"><input id="olTopHex" type="text" value="#E33636"></div><div class="colorline" style="margin-top:8px"><input id="olBot" type="color" value="#8e0000"><input id="olBotHex" type="text" value="#8E0000"></div></div>
+</div>
+<div class="full">
+<label for="iconBtn" data-i18n="icon">Icon</label>
+<div class="dd" id="ddIcon">
+<button type="button" class="dd-btn" id="iconBtn"><span id="iconLabel">None</span><span class="arrow">▾</span></button>
+<div class="dd-list" id="iconList">
+<button type="button" class="dd-item sel" data-val="none" data-i18n="iconNone">None</button>
+<button type="button" class="dd-item" data-val="custom" data-i18n="iconCustom">Custom upload (8x7)</button>
+</div>
+</div>
+<div id="iconUploadRow" style="display:none;margin-top:8px"><label class="file-drop"><input id="iconFile" type="file" accept="image/png"><span class="file-btn" data-i18n="fileBtn">Choose file</span><span class="file-meta"><b id="fileName">No file chosen</b><span>8x7 PNG</span></span></label><div id="iconErr" class="err"></div></div>
+</div>
+<div class="full">
+<label for="scaleBtn" data-i18n="scale">Export scale</label>
+<div class="dd" id="ddScale">
+<button type="button" class="dd-btn" id="scaleBtn"><span id="scaleLabel">1x</span><span class="arrow">▾</span></button>
+<div class="dd-list" id="scaleList">
+<button type="button" class="dd-item sel" data-val="1">1x</button>
+<button type="button" class="dd-item" data-val="2">2x</button>
+<button type="button" class="dd-item" data-val="4">4x</button>
+<button type="button" class="dd-item" data-val="8">8x</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="card" id="previewCard">
+<h2 data-i18n="preview">Preview</h2>
+<div class="stage"><canvas id="preview"></canvas></div>
+<p id="info"></p>
+<button id="dl" data-i18n="dl">⬇ Download PNG</button>
+</section>
+</div>
+</div>
+<script>
+const ORDER="0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ/\\-+!@#$%^";
+const OK=/[A-Z0-9 \/\-\\+!@#$%^]/;
+let glyphs={};
+const $=id=>document.getElementById(id);
+const hexRgb=h=>{h=h.replace("#","");if(h.length===3)h=[...h].map(c=>c+c).join("");const n=parseInt(h,16);return[n>>16&255,n>>8&255,n&255]};
+const rgbHex=([r,g,b])=>"#"+[r,g,b].map(v=>v.toString(16).padStart(2,"0")).join("").toUpperCase();
+const shift=(c,d)=>c.map(v=>Math.max(0,Math.min(255,v+d))); // ponytail: fixed +-30, upgrade ke HSL bila warna pucat meleset
+async function loadFont(){
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src="font.png"});
+  const c=document.createElement("canvas");c.width=img.width;c.height=img.height;
+  const x=c.getContext("2d",{willReadFrequently:true});x.drawImage(img,0,0);
+  const d=x.getImageData(0,0,c.width,c.height).data;
+  const at=(px,py)=>d[(py*c.width+px)*4+3]>128;
+  [...ORDER].forEach((ch,i)=>{
+    const cx=i<10?i:i<26?i-10:i<36?i-26:i-36, cy=i<10?0:i<26?1:i<36?2:3, pts=[];
+    for(let dy=1;dy<=5;dy++)for(let dx=1;dx<=5;dx++)if(at(cx*8+dx,cy*8+dy))pts.push([dx-1,dy-1]);
+    glyphs[ch]=pts;
+  });
+}
+let iconModeVal="none", iconData=null;
+function paint(cv,text,base,font,baseA=255,fontA=255,top=null,bot=null){
+  const n=text.length, adv=[...text].map(c=>c===" "?3:5);
+  const mainW=6+adv.reduce((a,b)=>a+b,0)+(n-1)*1, mainH=10;
+  const useIcon=iconModeVal==="custom"&&iconData;
+  const W=useIcon?12+3+mainW:mainW, H=useIcon?12:10;
+  if(!top)top=shift(base,30); if(!bot)bot=shift(base,-30);
+  cv.width=W;cv.height=H;
+  const x=cv.getContext("2d");
+  x.clearRect(0,0,W,H);
+  const px=(X,Y,[r,g,b],a=255)=>{x.fillStyle=`rgba(${r},${g},${b},${(a/255).toFixed(3)})`;x.fillRect(X,Y,1,1)};
+  const box=(ox,oy,bw,bh)=>{
+    for(let i=1;i<bw-1;i++)px(ox+i,oy,top,baseA);
+    for(let y=1;y<=bh-3+1;y++)for(let i=0;i<bw;i++)px(ox+i,oy+y,base,baseA);
+    px(ox,oy+1,top,baseA);px(ox+bw-1,oy+1,top,baseA);px(ox,oy+bh-2,bot,baseA);px(ox+bw-1,oy+bh-2,bot,baseA);
+    for(let i=1;i<bw-1;i++)px(ox+i,oy+bh-1,bot,baseA);
+  };
+  if(useIcon){
+    box(0,0,12,12);
+    const ix0=2, iy0=2;
+    for(let iy=0;iy<7;iy++)for(let ix=0;ix<8;ix++){
+      const p=iconData[(iy*8+ix)*4+3];
+      if(p>0)px(ix0+ix,iy0+iy+1,bot,Math.round(p*fontA/255));
+    }
+    for(let iy=0;iy<7;iy++)for(let ix=0;ix<8;ix++){
+      const o=(iy*8+ix)*4, p=iconData[o+3];
+      if(p>0)px(ix0+ix,iy0+iy,[iconData[o],iconData[o+1],iconData[o+2]],Math.round(p*fontA/255));
+    }
+    const ox=15, oy=1;
+    for(let i=1;i<mainW-1;i++)px(ox+i,oy,top,baseA);
+    for(let y=1;y<=8;y++)for(let i=0;i<mainW;i++)px(ox+i,oy+y,base,baseA);
+    px(ox,oy+1,top,baseA);px(ox+mainW-1,oy+1,top,baseA);px(ox,oy+8,bot,baseA);px(ox+mainW-1,oy+8,bot,baseA);
+    for(let i=1;i<mainW-1;i++)px(ox+i,oy+9,bot,baseA);
+    let cx=ox+3;const spots=[];
+    [...text].forEach((ch,k)=>{if(ch!==" ")for(const[dx,dy]of glyphs[ch])spots.push([cx+dx,oy+2+dy]);cx+=adv[k]+1});
+    for(const[sx,sy]of spots)px(sx,sy+1,bot,fontA);
+    for(const[sx,sy]of spots)px(sx,sy,font,fontA);
+  }else{
+    for(let i=1;i<W-1;i++)px(i,0,top,baseA);
+    for(let y=1;y<=8;y++)for(let i=0;i<W;i++)px(i,y,base,baseA);
+    px(0,1,top,baseA);px(W-1,1,top,baseA);px(0,8,bot,baseA);px(W-1,8,bot,baseA);
+    for(let i=1;i<W-1;i++)px(i,9,bot,baseA);
+    let cx=3;const spots=[];
+    [...text].forEach((ch,k)=>{if(ch!==" ")for(const[dx,dy]of glyphs[ch])spots.push([cx+dx,2+dy]);cx+=adv[k]+1});
+    for(const[sx,sy]of spots)px(sx,sy+1,bot,fontA);
+    for(const[sx,sy]of spots)px(sx,sy,font,fontA);
+  }
+  return{top,bot,W,H};
+}
+function render(){
+  const up=$("text").value.toUpperCase();
+  const bad=[...new Set([...up].filter(c=>!OK.test(c)))];
+  $("err").textContent=bad.length?t("rejected")+": "+bad.join(" "):"";
+  const text=[...up].filter(c=>OK.test(c)).join("").trim();
+  const base=hexRgb($("base").value), font=hexRgb($("font").value);
+  const baseA=+$("baseA").value, fontA=+$("fontA").value;
+  $("baseAVal").textContent=baseA;$("fontAVal").textContent=fontA;
+  const mode=olModeVal;
+  $("olSingleRow").style.display=mode==="single"?"flex":"none";
+  $("olDualRow").style.display=mode==="dual"?"block":"none";
+  $("iconUploadRow").style.display=iconModeVal==="custom"?"block":"none";
+  if(iconModeVal==="custom"&&!iconData){$("iconErr").textContent=t("iconNeed")}else if(iconData){$("iconErr").textContent=""}
+  let top=null,bot=null;
+  if(mode==="none"){top=base;bot=base}
+  else if(mode==="single"){top=hexRgb($("ol1").value);bot=top}
+  else if(mode==="dual"){top=hexRgb($("olTop").value);bot=hexRgb($("olBot").value)}
+  if(!text){$("preview").width=0;$("info").textContent=t("empty");return}
+  const{top:ptop,bot:pbot,W,H}=paint($("preview"),text,base,font,baseA,fontA,top,bot);
+  const s=Math.max(1,Math.min(16,Math.floor(380/W)));
+  $("preview").style.width=W*s+"px";$("preview").style.height=H*s+"px";
+  $("info").textContent=`${W}x${H}px - top ${rgbHex(ptop)} - bottom ${rgbHex(pbot)}`;
+}
+function selftest(){
+  console.assert(Object.keys(glyphs).length===46,"glyph!=46");
+  console.assert(glyphs["A"].length>0,"A kosong");
+  const c=document.createElement("canvas");
+  const r=paint(c,"OWNER",hexRgb("#C60000"),hexRgb("#FFDDDD"));
+  console.assert(r.W===35&&r.H===10,"OWNER harus 35x10, dapat "+r.W+"x"+r.H);
+  console.assert(JSON.stringify(r.top)===JSON.stringify([228,30,30]),"top salah: "+r.top);
+  console.assert(JSON.stringify(r.bot)===JSON.stringify([168,0,0]),"bottom salah: "+r.bot);
+  const x=c.getContext("2d").getImageData(0,0,35,10).data;
+  const at=(X,Y)=>[x[(Y*35+X)*4],x[(Y*35+X)*4+1],x[(Y*35+X)*4+2],x[(Y*35+X)*4+3]].join(",");
+  console.assert(at(0,0)==="0,0,0,0","(0,0) harus transparan");
+  console.assert(at(1,0)==="228,30,30","(1,0) bukan top");
+  console.assert(at(0,9)==="0,0,0,0","(0,9) harus transparan");
+  console.assert(at(1,9)==="168,0,0","(1,9) bukan bottom");
+  console.assert(at(3,2)!=="198,0,0","glyph O belum mulai di x=3");
+  console.assert(document.querySelectorAll(".sw").length===32,"swatch!=32");
+  const cx=document.createElement("canvas");
+  const ro=paint(cx,"A",hexRgb("#C60000"),hexRgb("#FFDDDD"),255,255,hexRgb("#111111"),hexRgb("#222222"));
+  console.assert(JSON.stringify(ro.top)===JSON.stringify([17,17,17]),"outline top override gagal");
+  console.assert(JSON.stringify(ro.bot)===JSON.stringify([34,34,34]),"outline bottom override gagal");
+  const ca=document.createElement("canvas");
+  paint(ca,"A",hexRgb("#C60000"),hexRgb("#FFDDDD"),128,200);
+  const cd=ca.getContext("2d").getImageData(0,0,ca.width,ca.height).data;
+  const aa=(X,Y)=>cd[(Y*ca.width+X)*4+3];
+  console.assert(aa(1,0)===128,"base alpha!=128, got "+aa(1,0));
+  console.assert(document.querySelectorAll(".dd-item").length===10,"dd items!=10");
+  const ic=document.createElement("canvas");
+  const keepIcon=iconModeVal, keepData=iconData;
+  iconData=new Uint8ClampedArray(8*7*4).fill(255);
+  iconModeVal="custom";
+  const ri=paint(ic,"A",hexRgb("#C60000"),hexRgb("#FFDDDD"));
+  console.assert(ri.W===12+3+11&&ri.H===12,"icon W/H salah: "+ri.W+"x"+ri.H);
+  iconModeVal=keepIcon;iconData=keepData;
+  console.log("self-test OK");
+}
+const PRESETS=["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#FFAA00","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#FFFFFF"];
+let LANG="en";
+const I18N={en:{sub:"Pixel badge Minecraft-style — type text, pick colors, download server-ready 1x PNG.",editor:"Editor",rankText:"Rank text",base:"Base color",font:"Font color",bgAlpha:"Background alpha",textAlpha:"Text alpha",outline:"Outline",olAuto:"Auto (follow base)",olNone:"None",olSingle:"Single color",olDual:"Top + bottom colors",icon:"Icon",iconNone:"None",iconCustom:"Custom upload (8x7)",iconBad:"Icon must be 8x7 PNG.",iconNeed:"Upload an 8x7 icon first.",scale:"Export scale",preview:"Preview",dl:"⬇ Download PNG",fileBtn:"Choose file",noFile:"No file chosen",rejected:"Rejected characters",empty:"Type some text first.",fontErr:"font.png unreadable. If opened via file:// in Chrome, run a local server e.g. npx serve then open http://localhost:3000."},id:{sub:"Pixel badge ala Minecraft — ketik teks, pilih warna, unduh PNG 1x siap server.",editor:"Editor",rankText:"Teks rank",base:"Warna base",font:"Warna font",bgAlpha:"Alpha background",textAlpha:"Alpha teks",outline:"Outline",olAuto:"Otomatis (ikut base)",olNone:"Tanpa outline",olSingle:"1 warna",olDual:"Warna atas + bawah",icon:"Ikon",iconNone:"Tanpa ikon",iconCustom:"Upload custom (8x7)",iconBad:"Ikon harus PNG 8x7.",iconNeed:"Upload ikon 8x7 dulu.",scale:"Scale export",preview:"Pratinjau",dl:"⬇ Unduh PNG",fileBtn:"Pilih berkas",noFile:"Belum ada berkas",rejected:"Karakter ditolak",empty:"Masukkan teks dulu.",fontErr:"font.png tidak terbaca. Jika dibuka via file:// di Chrome, jalankan server lokal mis. npx serve lalu buka http://localhost:3000."}};
+const t=k=>I18N[LANG][k]||k;
+function setLang(l){LANG=l;document.documentElement.lang=l;document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n)});$("langEn").classList.toggle("on",l==="en");$("langId").classList.toggle("on",l==="id");$("olModeLabel").textContent=t({auto:"olAuto",none:"olNone",single:"olSingle",dual:"olDual"}[olModeVal]);$("iconLabel").textContent=t({none:"iconNone",custom:"iconCustom"}[iconModeVal]);if(!iconData)$("fileName").textContent=t("noFile");render()}
+const tint=h=>{const[r,g,b]=hexRgb(h);return rgbHex([r,g,b].map(v=>Math.round(v+(255-v)*0.85)))};
+const FONT_PRESETS=PRESETS.map(tint);
+function mkSw(el,target,hex,list){const box=$(el);list.forEach(c=>{const b=document.createElement("button");b.type="button";b.className="sw";b.style.background=c;b.title=c;b.addEventListener("click",()=>{$(target).value=c;$(hex).value=c;render()});box.appendChild(b)})}
+function sync(color,hex){
+  $(color).addEventListener("input",()=>{$(hex).value=$(color).value.toUpperCase();render()});
+  $(hex).addEventListener("input",()=>{const v=$(hex).value;if(/^#?[0-9a-fA-F]{6}$/.test(v)){$(color).value=v.startsWith("#")?v:"#"+v;render()}});
+}
+$("text").addEventListener("input",render);
+let olModeVal="auto", scaleVal=1;
+function mkDropdown(dd,btn,list,label,onPick){
+  const box=$(dd), b=$(btn), li=$(list), lab=$(label);
+  const items=[...li.querySelectorAll(".dd-item")];
+  const close=()=>{box.classList.remove("open");b.classList.remove("open");items.forEach(i=>i.style.transitionDelay="0ms")};
+  b.addEventListener("click",e=>{
+    e.stopPropagation();
+    const was=box.classList.contains("open");
+    document.querySelectorAll(".dd.open").forEach(o=>o.classList.remove("open"));
+    document.querySelectorAll(".dd-btn.open").forEach(o=>o.classList.remove("open"));
+    if(was){close();return}
+    const r=box.getBoundingClientRect();
+    box.classList.toggle("up",r.bottom+220>window.innerHeight);
+    box.classList.add("open");b.classList.add("open");
+    items.forEach((it,i)=>it.style.transitionDelay=(i*35)+"ms");
+  });
+  items.forEach(it=>it.addEventListener("click",e=>{
+    e.stopPropagation();
+    items.forEach(o=>o.classList.remove("sel"));it.classList.add("sel");
+    lab.textContent=it.textContent;close();onPick(it.dataset.val);
+  }));
+  document.addEventListener("click",close);
+  document.addEventListener("keydown",e=>{if(e.key==="Escape")close()});
+}
+mkDropdown("ddOl","olModeBtn","olModeList","olModeLabel",v=>{olModeVal=v;render()});
+mkDropdown("ddScale","scaleBtn","scaleList","scaleLabel",v=>{scaleVal=+v});
+mkDropdown("ddIcon","iconBtn","iconList","iconLabel",v=>{iconModeVal=v;render()});
+$("iconFile").addEventListener("change",e=>{
+  const f=e.target.files[0]; if(!f)return;
+  $("fileName").textContent=f.name;
+  const img=new Image();
+  img.onload=()=>{
+    if(img.width!==8||img.height!==7){$("iconErr").textContent=t("iconBad");iconData=null;URL.revokeObjectURL(img.src);render();return}
+    $("iconErr").textContent="";
+    const c=document.createElement("canvas");c.width=8;c.height=7;
+    const cx=c.getContext("2d",{willReadFrequently:true});cx.drawImage(img,0,0);
+    iconData=cx.getImageData(0,0,8,7).data;
+    URL.revokeObjectURL(img.src);render();
+  };
+  img.src=URL.createObjectURL(f);
+});
+$("baseA").addEventListener("input",render);
+$("fontA").addEventListener("input",render);
+$("langEn").addEventListener("click",()=>setLang("en"));
+$("langId").addEventListener("click",()=>setLang("id"));
+sync("base","baseHex");sync("font","fontHex");
+sync("ol1","ol1Hex");sync("olTop","olTopHex");sync("olBot","olBotHex");
+mkSw("baseSw","base","baseHex",PRESETS);mkSw("fontSw","font","fontHex",FONT_PRESETS);
+$("dl").addEventListener("click",()=>{
+  const s=scaleVal, src=$("preview");
+  if(!src.width)return;
+  const out=document.createElement("canvas");out.width=src.width*s;out.height=src.height*s;
+  const ox=out.getContext("2d");ox.imageSmoothingEnabled=false;ox.drawImage(src,0,0,out.width,out.height);
+  const name="rank-"+$("text").value.toUpperCase().replace(/[^A-Z0-9]+/g,"_")+".png";
+  const a=document.createElement("a");a.download=name;a.href=out.toDataURL("image/png");a.click();
+});
+loadFont().then(()=>{selftest();setLang("en")}).catch(e=>{$("err").textContent=t("fontErr")});
+</script>
+</body>
+</html>
