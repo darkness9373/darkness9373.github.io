@@ -16,7 +16,7 @@ body{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;background
 .hero p{margin:6px 0 18px;color:var(--mut)}
 .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px;flex:1;min-height:0}
 .grid>*{min-width:0;min-height:0}
-@media(max-width:760px){.grid{grid-template-columns:1fr;overflow-y:auto}}
+@media(max-width:760px){.grid{grid-template-columns:1fr;overflow-y:auto}#previewCard{order:-1}}
 @media(max-width:760px){body{height:auto;overflow:auto}.wrap{height:auto}}
 .card{background:linear-gradient(180deg,#262d4b,#1d2338);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 12px 32px rgba(0,0,0,.4);min-height:0}
 #editorCard{overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--line) transparent}
@@ -25,6 +25,12 @@ body{font-family:ui-sans-serif,system-ui,"Segoe UI",Roboto,sans-serif;background
 #editorCard::-webkit-scrollbar-track{background:transparent}
 #previewCard{overflow:hidden;display:flex;flex-direction:column}
 .card h2{margin:0 0 6px;font-size:14px;text-transform:uppercase;letter-spacing:1.5px;color:var(--mut)}
+.tabs{display:flex;gap:6px;margin:10px 0 4px;background:#141834;border:1px solid var(--line);border-radius:999px;padding:4px}
+.tabs button{flex:1;background:transparent;color:var(--mut);border:0;border-radius:999px;padding:8px 12px;font-size:13px;font-weight:800;cursor:pointer;margin:0;transition:background .15s,color .15s}
+.tabs button:hover{color:var(--txt)}
+.tabs button.on{color:#06130a;background:linear-gradient(180deg,#7dffab,#3ddc74)}
+.tabpane{display:none}
+.tabpane.on{display:block}
 label{display:block;margin:12px 0 6px;font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:1px}
 input[type=text],select{width:100%;padding:10px 12px;font-size:16px;background:#141834;color:var(--txt);border:1px solid var(--line);border-radius:10px;outline:none;transition:border-color .15s,box-shadow .15s,transform .15s}
 input[type=text]:hover,select:hover{border-color:var(--acc2);box-shadow:0 0 0 3px rgba(56,189,248,.16);transform:translateY(-1px)}
@@ -96,22 +102,24 @@ input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#1
 <label for="text" data-i18n="rankText">Rank text</label>
 <input id="text" type="text" value="OWNER" autocomplete="off" spellcheck="false">
 <div id="err" class="err"></div>
-<div class="row">
-<div>
-<label for="base" data-i18n="base">Base color</label>
-<div class="colorline"><input id="base" type="color" value="#c60000">
-<input id="baseHex" type="text" value="#C60000"></div>
-<div class="alphaline"><span data-i18n="bgAlpha">Background alpha</span><div class="arow"><input id="baseA" type="range" min="0" max="255" value="255"><output id="baseAVal">255</output></div></div>
-<div class="swatches" id="baseSw"></div>
+<div class="tabs">
+<button type="button" id="tabBtnText" class="on" data-i18n="textTab">Text</button>
+<button type="button" id="tabBtnBg" data-i18n="bgTab">Background</button>
 </div>
-<div>
+<div id="tabText" class="tabpane on">
 <label for="font" data-i18n="font">Font color</label>
 <div class="colorline"><input id="font" type="color" value="#ffdddd">
 <input id="fontHex" type="text" value="#FFDDDD"></div>
 <div class="alphaline"><span data-i18n="textAlpha">Text alpha</span><div class="arow"><input id="fontA" type="range" min="0" max="255" value="255"><output id="fontAVal">255</output></div></div>
 <div class="swatches" id="fontSw"></div>
 </div>
-<div class="full">
+<div id="tabBg" class="tabpane">
+<label for="base" data-i18n="base">Base color</label>
+<div class="colorline"><input id="base" type="color" value="#c60000">
+<input id="baseHex" type="text" value="#C60000"></div>
+<div class="alphaline"><span data-i18n="bgAlpha">Background alpha</span><div class="arow"><input id="baseA" type="range" min="0" max="255" value="255"><output id="baseAVal">255</output></div></div>
+<div class="swatches" id="baseSw"></div>
+<div style="margin-top:4px">
 <label for="olModeBtn" data-i18n="outline">Outline</label>
 <div class="dd" id="ddOl">
 <button type="button" class="dd-btn" id="olModeBtn"><span id="olModeLabel">Auto (follow base)</span><span class="arrow">▾</span></button>
@@ -125,7 +133,7 @@ input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#1
 <div id="olSingleRow" class="colorline" style="margin-top:8px;display:none"><input id="ol1" type="color" value="#e33636"><input id="ol1Hex" type="text" value="#E33636"></div>
 <div id="olDualRow" style="display:none;margin-top:8px"><div class="colorline"><input id="olTop" type="color" value="#e33636"><input id="olTopHex" type="text" value="#E33636"></div><div class="colorline" style="margin-top:8px"><input id="olBot" type="color" value="#8e0000"><input id="olBotHex" type="text" value="#8E0000"></div></div>
 </div>
-<div class="full">
+<div style="margin-top:4px">
 <label for="iconBtn" data-i18n="icon">Icon</label>
 <div class="dd" id="ddIcon">
 <button type="button" class="dd-btn" id="iconBtn"><span id="iconLabel">None</span><span class="arrow">▾</span></button>
@@ -136,7 +144,13 @@ input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#1
 </div>
 <div id="iconUploadRow" style="display:none;margin-top:8px"><label class="file-drop"><input id="iconFile" type="file" accept="image/png"><span class="file-btn" data-i18n="fileBtn">Choose file</span><span class="file-meta"><b id="fileName">No file chosen</b><span>8x7 PNG</span></span></label><div id="iconErr" class="err"></div></div>
 </div>
-<div class="full">
+</div>
+</section>
+<section class="card" id="previewCard">
+<h2 data-i18n="preview">Preview</h2>
+<div class="stage"><canvas id="preview"></canvas></div>
+<p id="info"></p>
+<div style="margin-top:4px">
 <label for="scaleBtn" data-i18n="scale">Export scale</label>
 <div class="dd" id="ddScale">
 <button type="button" class="dd-btn" id="scaleBtn"><span id="scaleLabel">1x</span><span class="arrow">▾</span></button>
@@ -148,12 +162,6 @@ input[type=color]{width:52px;height:42px;flex:0 0 auto;padding:4px;background:#1
 </div>
 </div>
 </div>
-</div>
-</section>
-<section class="card" id="previewCard">
-<h2 data-i18n="preview">Preview</h2>
-<div class="stage"><canvas id="preview"></canvas></div>
-<p id="info"></p>
 <button id="dl" data-i18n="dl">⬇ Download PNG</button>
 </section>
 </div>
@@ -287,7 +295,7 @@ function selftest(){
 }
 const PRESETS=["#000000","#0000AA","#00AA00","#00AAAA","#AA0000","#AA00AA","#FFAA00","#AAAAAA","#555555","#5555FF","#55FF55","#55FFFF","#FF5555","#FF55FF","#FFFF55","#FFFFFF"];
 let LANG="en";
-const I18N={en:{sub:"Pixel badge Minecraft-style — type text, pick colors, download server-ready 1x PNG.",editor:"Editor",rankText:"Rank text",base:"Base color",font:"Font color",bgAlpha:"Background alpha",textAlpha:"Text alpha",outline:"Outline",olAuto:"Auto (follow base)",olNone:"None",olSingle:"Single color",olDual:"Top + bottom colors",icon:"Icon",iconNone:"None",iconCustom:"Custom upload (8x7)",iconBad:"Icon must be 8x7 PNG.",iconNeed:"Upload an 8x7 icon first.",scale:"Export scale",preview:"Preview",dl:"⬇ Download PNG",fileBtn:"Choose file",noFile:"No file chosen",rejected:"Rejected characters",empty:"Type some text first.",fontErr:"font.png unreadable. If opened via file:// in Chrome, run a local server e.g. npx serve then open http://localhost:3000."},id:{sub:"Pixel badge ala Minecraft — ketik teks, pilih warna, unduh PNG 1x siap server.",editor:"Editor",rankText:"Teks rank",base:"Warna base",font:"Warna font",bgAlpha:"Alpha background",textAlpha:"Alpha teks",outline:"Outline",olAuto:"Otomatis (ikut base)",olNone:"Tanpa outline",olSingle:"1 warna",olDual:"Warna atas + bawah",icon:"Ikon",iconNone:"Tanpa ikon",iconCustom:"Upload custom (8x7)",iconBad:"Ikon harus PNG 8x7.",iconNeed:"Upload ikon 8x7 dulu.",scale:"Scale export",preview:"Pratinjau",dl:"⬇ Unduh PNG",fileBtn:"Pilih berkas",noFile:"Belum ada berkas",rejected:"Karakter ditolak",empty:"Masukkan teks dulu.",fontErr:"font.png tidak terbaca. Jika dibuka via file:// di Chrome, jalankan server lokal mis. npx serve lalu buka http://localhost:3000."}};
+const I18N={en:{sub:"Pixel badge Minecraft-style — type text, pick colors, download server-ready 1x PNG.",editor:"Editor",rankText:"Rank text",textTab:"Text",bgTab:"Background",base:"Base color",font:"Font color",bgAlpha:"Background alpha",textAlpha:"Text alpha",outline:"Outline",olAuto:"Auto (follow base)",olNone:"None",olSingle:"Single color",olDual:"Top + bottom colors",icon:"Icon",iconNone:"None",iconCustom:"Custom upload (8x7)",iconBad:"Icon must be 8x7 PNG.",iconNeed:"Upload an 8x7 icon first.",scale:"Export scale",preview:"Preview",dl:"⬇ Download PNG",fileBtn:"Choose file",noFile:"No file chosen",rejected:"Rejected characters",empty:"Type some text first.",fontErr:"font.png unreadable. If opened via file:// in Chrome, run a local server e.g. npx serve then open http://localhost:3000."},id:{sub:"Pixel badge ala Minecraft — ketik teks, pilih warna, unduh PNG 1x siap server.",editor:"Editor",rankText:"Teks rank",textTab:"Teks",bgTab:"Background",base:"Warna base",font:"Warna font",bgAlpha:"Alpha background",textAlpha:"Alpha teks",outline:"Outline",olAuto:"Otomatis (ikut base)",olNone:"Tanpa outline",olSingle:"1 warna",olDual:"Warna atas + bawah",icon:"Ikon",iconNone:"Tanpa ikon",iconCustom:"Upload custom (8x7)",iconBad:"Ikon harus PNG 8x7.",iconNeed:"Upload ikon 8x7 dulu.",scale:"Scale export",preview:"Pratinjau",dl:"⬇ Unduh PNG",fileBtn:"Pilih berkas",noFile:"Belum ada berkas",rejected:"Karakter ditolak",empty:"Masukkan teks dulu.",fontErr:"font.png tidak terbaca. Jika dibuka via file:// di Chrome, jalankan server lokal mis. npx serve lalu buka http://localhost:3000."}};
 const t=k=>I18N[LANG][k]||k;
 function setLang(l){LANG=l;document.documentElement.lang=l;document.querySelectorAll("[data-i18n]").forEach(el=>{el.textContent=t(el.dataset.i18n)});$("langEn").classList.toggle("on",l==="en");$("langId").classList.toggle("on",l==="id");$("olModeLabel").textContent=t({auto:"olAuto",none:"olNone",single:"olSingle",dual:"olDual"}[olModeVal]);$("iconLabel").textContent=t({none:"iconNone",custom:"iconCustom"}[iconModeVal]);if(!iconData)$("fileName").textContent=t("noFile");render()}
 const tint=h=>{const[r,g,b]=hexRgb(h);return rgbHex([r,g,b].map(v=>Math.round(v+(255-v)*0.85)))};
@@ -298,6 +306,9 @@ function sync(color,hex){
   $(hex).addEventListener("input",()=>{const v=$(hex).value;if(/^#?[0-9a-fA-F]{6}$/.test(v)){$(color).value=v.startsWith("#")?v:"#"+v;render()}});
 }
 $("text").addEventListener("input",render);
+function setTab(which){const isText=which==="text";$("tabBtnText").classList.toggle("on",isText);$("tabBtnBg").classList.toggle("on",!isText);$("tabText").classList.toggle("on",isText);$("tabBg").classList.toggle("on",!isText)}
+$("tabBtnText").addEventListener("click",()=>setTab("text"));
+$("tabBtnBg").addEventListener("click",()=>setTab("bg"));
 let olModeVal="auto", scaleVal=1;
 function mkDropdown(dd,btn,list,label,onPick){
   const box=$(dd), b=$(btn), li=$(list), lab=$(label);
